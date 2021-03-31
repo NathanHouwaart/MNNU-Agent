@@ -1,5 +1,6 @@
 import os
 import sys
+import textwrap
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append('../lib')
@@ -15,7 +16,6 @@ async def main(aries_cloudagent_agent: Agent):
     # Initialize object
     await aries_cloudagent_agent.initialize()
     await aries_cloudagent_agent.receive_invitation()
-    #inv_id, invitation = await aries_cloudagent_agent.generate_invitation(display_qr=True)
 
     while True:
         await asyncio.sleep(1.0)
@@ -25,7 +25,6 @@ if __name__ == "__main__":
     parser = argument_parser()
     args = parser.parse_args()
     
-    log_args(args, color=LOG_COLOR)
     
     # Construct Aries cloud agent object
     aries_cloudagent_agent = Agent(

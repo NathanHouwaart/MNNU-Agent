@@ -1,5 +1,6 @@
 import os
 import sys
+import asyncio
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append('../lib')
@@ -7,9 +8,6 @@ sys.path.append('../lib')
 from argument_parser import argument_parser, log_args
 from agent import Agent
 from logger import log_msg, line_info
-
-
-LOG_COLOR = "fg:gold"
 
 async def main(aries_cloudagent_agent):
 
@@ -25,7 +23,6 @@ async def main(aries_cloudagent_agent):
 if __name__ == "__main__":
     parser = argument_parser()
     args = parser.parse_args()
-    
     log_args(args)
     
     # Construct Aries cloud agent object
@@ -47,8 +44,6 @@ if __name__ == "__main__":
         loop.run_until_complete(main(aries_cloudagent_agent))
     except KeyboardInterrupt:
         log_msg(f"{line_info()}Sutting down agent...",color=LOG_COLOR)
-    # except Exception as (errno, strerror):
-    #     log_msg(f"{line_info()}Encountered exception: {errno}, {strerror}")
     finally:
         loop.run_until_complete(aries_cloudagent_agent.terminate())
         loop.close()

@@ -53,8 +53,8 @@ class Container:
         agent_args = self.get_process_args()
         log_msg(f"{line_info()}Starting agent with args: {agent_args}")
         # start agent sub-process
-        # TODO: Catch invalid key/ arguments error.
-        self.container_process = await asyncio.create_subprocess_exec(
+        
+        self.container_process = await asyncio.create_subprocess_exec( # TODO: Catch invalid key/ arguments error.
             *agent_args
         )
         if wait: # Wait for agent to start up
@@ -97,7 +97,7 @@ class Container:
         if self.container_process and self.container_process.returncode is None:
             try:
                 self.container_process.terminate()
-                await asyncio.wait_for(self.container_process.communicate(), timeout=0.5)
+                await asyncio.wait_for(self.container_process.communicate(), timeout=1)
                 log_msg(f"{line_info()}Docker Container exited with return code {self.container_process.returncode}")
             except asyncio.TimeoutError:
                 msg = f"{line_info()}Process did not terminate in time"

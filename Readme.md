@@ -11,3 +11,12 @@ The MNNU-Agent library makes it possible to interact with a blockchain ledger th
 - Timeout when starting agent
 
 
+
+#
+- ScrumMaster
+- Upgraden van aries cloud agent versie
+- Afronden cursus
+- In elkaar zetten demo
+- Documenteren demo
+
+
