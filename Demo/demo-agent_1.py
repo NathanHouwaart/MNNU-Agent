@@ -7,7 +7,7 @@ sys.path.append('../lib')
 
 from argument_parser import argument_parser, log_args
 from agent import Agent
-from logger import log_msg, line_info
+from logger import log_msg, line_info, prompt_loop
 
 async def main(aries_cloudagent_agent):
 
@@ -16,6 +16,14 @@ async def main(aries_cloudagent_agent):
     inv_id, invitation = await aries_cloudagent_agent.generate_invitation(display_qr=True)
     # log_msg(f"{line_info()}Invitation: {invitation}")
 
+    options = "1. Show Connections\n2. Exit\n"
+    async for option in prompt_loop(options):
+        if int(option) == 1:
+            print(await aries_cloudagent_agent.connections())
+        if int(option) ==2:
+            await aries_cloudagent_agent.terminate()
+            os._exit(0)
+    
     while True:
         await asyncio.sleep(1.0)
 
@@ -39,13 +47,13 @@ if __name__ == "__main__":
         auto_response=args.no_auto
     )
     
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main(aries_cloudagent_agent))
-    except KeyboardInterrupt:
-        log_msg(f"{line_info()}Sutting down agent...",color=LOG_COLOR)
-    finally:
-        loop.run_until_complete(aries_cloudagent_agent.terminate())
-        loop.close()
-        os._exit(1)
+    # try:
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(aries_cloudagent_agent))
+    # except KeyboardInterrupt:
+    #     log_msg(f"{line_info()}Sutting down agent...",color=LOG_COLOR)
+    # finally:
+    #     loop.run_until_complete(aries_cloudagent_agent.terminate())
+    #     loop.close()
+    #     os._exit(1)
     

@@ -16,6 +16,10 @@ async def main(aries_cloudagent_agent: Agent):
     # Initialize object
     await aries_cloudagent_agent.initialize()
     await aries_cloudagent_agent.receive_invitation()
+    
+    options = "1. Show Connections\n2. Exit"
+    async for option in prompt_loop(options):
+        print(option)
 
     while True:
         await asyncio.sleep(1.0)
@@ -43,8 +47,8 @@ if __name__ == "__main__":
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main(aries_cloudagent_agent))
-    except Exception as e:
-        log_msg(f"{line_info()}Encountered exception: {e.__doc__}, {e.message}")
+    # except Exception as e:
+    #     log_msg(f"{line_info()}Encountered exception: {e.__doc__}, {e.message}")
     finally:
         loop.run_until_complete(aries_cloudagent_agent.terminate())
         loop.close()

@@ -13,7 +13,7 @@ import binascii
 from container import Container
 from api_handler import ApiHandler
 from webhook_server import WebhookServer
-from logger import log_msg, log_timer, output_reader, default_timer, line_info, repr_json, prompt_loop, prompt
+from logger import *
 from aiohttp import (
     web,
     ClientSession,
@@ -113,6 +113,9 @@ class Agent:
 
     async def create_schema(self, schema: dict) -> dict:
         return self.api_handler.create_schema(schema)
+
+    async def connections(self, *,alias_query: str=None, invitation_key_query: str=None, my_did_query: str=None, connection_state_query: str=None, their_did_query: str=None, their_role_query: str=None) -> dict:
+        return self.api_handler.connections(alias_query=alias_query, invitation_key_query=invitation_key_query, connection_state_query=connection_state_query, their_did_query=their_did_query, their_role_query=their_did_query)
     
     async def generate_invitation(self, auto_accept: bool = True, multi_use: bool = False, display_qr: bool = False) ->tuple:
         invitation_id, invitation =  self.api_handler.create_invitation(alias=self.identity, multi_use=multi_use, auto_accept=auto_accept)

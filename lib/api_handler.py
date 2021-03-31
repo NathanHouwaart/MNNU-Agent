@@ -5,8 +5,6 @@ import re
 from typing import Tuple, Union
 import json
 
-
-
 endpoints = {
     "create_invitation": "/connections/create-invitation",
     "receive_invitation": "/connections/receive-invitation",
@@ -115,7 +113,7 @@ class ApiHandler:
             'accept': 'application/json',
         }
 
-        response = requests.get(f'http://localhost:8021/connections{string}', headers=headers) #TODO: hardcoded
+        response = requests.get(f'{self.__api_url}/connections{string}', headers=headers) #TODO: hardcoded
         return response.json()
 
     def create_invitation(self, alias: str, multi_use: bool, auto_accept: bool) -> Tuple[str, str]:
