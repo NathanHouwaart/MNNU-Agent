@@ -2,14 +2,16 @@ import os
 import sys
 import asyncio
 import json
+import textwrap
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append('../lib')
+sys.path.append('../Lib')
 
 from argument_parser import argument_parser, log_args
 from agent import Agent
 from logger import log_msg, line_info, prompt_loop
 
+LOG_COLOR="aqua"
 
 async def main(aries_cloudagent_agent):
     """
@@ -22,18 +24,21 @@ async def main(aries_cloudagent_agent):
 "1. Show Connections\n\
 2. Generate invitation\n\
 3. Receive inivtaiotn\n\
-4. Exit\n")
+4. Send Message\n\
+5. Exit\n")
     
     async for option in prompt_loop(options):
         if int(option) == 1:
             connections = await aries_cloudagent_agent.connections()
-            print(json.dumps(connections, indent=4, sort_keys=True))
-            print("Total connections:", len(connections["results"]))
+            log_msg(f"{line_info()}{json.dumps(connections, indent=4, sort_keys=True)}", color=LOG_COLOR)
+            log_msg(f"{line_info()}Total connections:", len(connections["results"]), color=LOG_COLOR)
         elif int(option) == 2:
             await aries_cloudagent_agent.generate_invitation(display_qr=True)
         elif int(option) == 3:
-            await aries_cloudagent_agent.receive_invitation()
-        elif int(option) ==4:
+            await aries_cloudagent_agent.receive_invitation(invitation=None, alias=None, auto_accept=None)
+        elif int(option) == 4:
+            await aries_cloudagent_agent.send_message(connection_id=None, message=None)
+        elif int(option) ==5:
             return
     while True:
         await asyncio.sleep(1.0)

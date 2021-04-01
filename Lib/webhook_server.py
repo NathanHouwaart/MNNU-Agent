@@ -72,7 +72,7 @@ class WebhookServer():
                 )
 
     async def handle_basicmessages(self, message):
-        self.log(f"{line_info()}Received message:", message["content"])
+        log_msg(f"{line_info()}Received message:", message["content"])
     
     async def handle_connections(self, test):
         print("test", test)

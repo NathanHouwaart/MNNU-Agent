@@ -80,7 +80,7 @@ class ApiHandler:
             "content": f"{message}"
         }
 
-        response = requests.post(f"{self.__api_url}/{connection_id}/send-message", headers=headers, json=data)
+        response = requests.post(f"{self.__api_url}/connections/{connection_id}/send-message", headers=headers, json=data)
         return response
 
     def connections(self, *,alias_query: str=None, invitation_key_query: str=None, my_did_query: str=None, connection_state_query: str=None, their_did_query: str=None, their_role_query: str=None) -> dict:

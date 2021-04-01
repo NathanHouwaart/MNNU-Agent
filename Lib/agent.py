@@ -121,12 +121,16 @@ class Agent:
         invitation_id, invitation =  self.api_handler.create_invitation(alias=self.identity, multi_use=multi_use, auto_accept=auto_accept)
         if display_qr:
             qr = QRCode(border=1)
-            qr.add_data(invitation)
+            qr.add_data(json.dumps(invitation))
             log_msg(f"{line_info()}Use the following JSON to accept the invite from another demo agent. Or use the QR code to connect from a mobile agent.")
             log_msg(f"{line_info()}Invitation Data:",json.dumps(invitation))
             qr.print_ascii(invert=True)
         return invitation_id, invitation
 
+    async def send_message(self, connection_id: str, message: str):
+        connection_id = await prompt("Send message to <connection id> :") #TODO: Throw exception when invitation is invalid
+        message = await prompt("Message <message>:") #TODO: Throw exception when invitation is invalid
+        self.api_handler.send_message(connection_id, message)
 
     async def register_did( #TODO: verplaatsen
         self,
@@ -154,13 +158,14 @@ class Agent:
         log_msg(f"{line_info()}Registered DID: {self.did}")
 
     
-    async def receive_invitation(self):
+    async def receive_invitation(self, invitation, alias=None, auto_accept=False):
         invitation = await prompt("Invite details: ") #TODO: Throw exception when invitation is invalid
-        print(invitation)
-        connection_id = self.api_handler.receive_invitation(
-            invitation_url=invitation,
-            alias="Desktop_conn", auto_accept=False
-        )
+        auto_accept = await prompt("n/y: ") #TODO: Throw exception when invitation is invalid
+        if auto_accept == "y":
+            auto_accept = True
+        else:
+            auto_accept = False
+        connection_id = self.api_handler.receive_invitation(invitation_url=invitation, alias=self.identity, auto_accept=True)
 
 
 
