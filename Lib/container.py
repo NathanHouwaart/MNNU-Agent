@@ -16,6 +16,7 @@ from aiohttp import (
     ClientTimeout,
 )
 
+LOG_COLOR= "violet"
 
 class Container:
     """Container class to represent, initialize and maintain a running docker container"""
@@ -45,19 +46,19 @@ class Container:
         self.webhook_url             = webhook_url
         self.genesis_url             = genesis_url
 
-    
+
     async def start_process(self, wait: bool = True):
-        log_msg("Start Docker container")
+        log_msg("Start Docker container", color=LOG_COLOR)
 
         agent_args = self.get_process_args()
-        log_msg(f"Starting agent with args: {agent_args}")
+        log_msg(f"Starting agent with args: {agent_args}", color=LOG_COLOR)
         
         self.container_process = await asyncio.create_subprocess_exec(  # TODO: Catch invalid key/ arguments error.
             *agent_args
         )
         if wait: 
             await asyncio.sleep(5.0)                                    #TODO: Timeout verplaatsen naar api handler
-        log_msg("Docker container started")
+        log_msg("Docker container started", color=LOG_COLOR)
 
     def get_process_args(self):
         # TODO: goed implementeren 
@@ -90,16 +91,16 @@ class Container:
         return result
 
     async def terminate(self):
-        log_msg(f"Shutting down agent")
+        log_msg(f"Shutting down agent", color=LOG_COLOR)
         
         # Check if process exists and is running
         if self.container_process and self.container_process.returncode is None:
             try:
                 self.container_process.terminate()
                 await asyncio.wait_for(self.container_process.communicate(), timeout=1)
-                log_msg(f"Docker Container exited with return code {self.container_process.returncode}")
+                log_msg(f"Docker Container exited with return code {self.container_process.returncode}", color=LOG_COLOR)
             except asyncio.TimeoutError:
                 msg = f"Process did not terminate in time"
-                log_msg(msg)
+                log_msg(msg, color=LOG_COLOR)
                 await self.container_process.kill()
                 raise Exception(msg)

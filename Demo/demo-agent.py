@@ -29,7 +29,7 @@ async def main(aries_cloudagent_agent):
 5. Get connection state\n\
 6. Exit\n")
     
-   
+    await asyncio.sleep(1.0)
     async for option in prompt_loop(options):
         # try:
         if int(option) == 1:

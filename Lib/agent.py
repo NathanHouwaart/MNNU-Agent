@@ -19,6 +19,7 @@ from aiohttp import (
     ClientTimeout,
 )
 
+LOG_COLOR = "cyan"
 
 class Agent:
     """
@@ -92,7 +93,6 @@ class Agent:
         Start a webhook server, register a DID and start a docker container process
         
         """
-        
         await self.webhook_server.start_process()
         await self.register_did()
         await self.docker_container.start_process()
@@ -101,8 +101,9 @@ class Agent:
             return
         self.admin_url = f"{self.transport_protocol}://{self.ledger_ip}:{self.start_port+1}"
         self.endpoint =  f"{self.transport_protocol}://{self.ledger_ip}:{self.start_port}"
-        log_msg("Admin URL is at:", self.admin_url)
-        log_msg("Endpoint URL is at:", self.endpoint)
+        log_msg(f"Admin URL is at: {self.admin_url}", color=LOG_COLOR)
+        log_msg(f"Endpoint URL is at: {self.endpoint}", color=LOG_COLOR)
+
 
     async def create_schema(self, schema: dict) -> dict:
         return self.api_handler.create_schema(schema)
@@ -115,8 +116,8 @@ class Agent:
         if display_qr:
             qr = QRCode(border=1)
             qr.add_data(json.dumps(invitation))
-            log_msg(f"Use the following JSON to accept the invite from another demo agent. Or use the QR code to connect from a mobile agent.")
-            log_msg(f"Invitation Data:",json.dumps(invitation))
+            log_msg(f"Use the following JSON to accept the invite from another demo agent. Or use the QR code to connect from a mobile agent.", color=LOG_COLOR)
+            log_msg(f"Invitation Data:",json.dumps(invitation), color=LOG_COLOR)
             qr.print_ascii(invert=True)
         return invitation_id, invitation
 
@@ -133,7 +134,7 @@ class Agent:
         verkey: str = None,
         role: str = "TRUST_ANCHOR",
     ):
-        log_msg(f"Registering {self.identity} ...")
+        log_msg(f"Registering {self.identity} ...", color=LOG_COLOR)
         data = {"alias": alias or self.identity, "role": role}
         if did and verkey:
             data["did"] = did
@@ -147,8 +148,8 @@ class Agent:
                 raise Exception(f"Error registering DID, response code {resp.status}")
             nym_info = await resp.json()
             self.did = nym_info["did"]
-            log_msg(f"nym_info: {nym_info}")
-        log_msg(f"Registered DID: {self.did}")
+            log_msg(f"nym_info: {nym_info}", color=LOG_COLOR)
+        log_msg(f"Registered DID: {self.did}", color=LOG_COLOR)
 
     
     async def receive_invitation(self, invitation, alias=None, auto_accept=False):
@@ -165,7 +166,7 @@ class Agent:
         return self.api_handler.get_connection_state(connection_id)
 
     async def terminate(self):
-        log_msg(f"Shutting down {self.identity}")
+        log_msg(f"Shutting down {self.identity}", color=LOG_COLOR)
         
         await self.client_session.close()       # Close session to admin api
         await self.webhook_server.terminate()   # Shut down web hooks first
