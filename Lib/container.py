@@ -6,7 +6,7 @@ import subprocess
 import functools
 import json
 
-from logger import log_msg, log_timer, output_reader, default_timer, line_info
+from utilities import log_msg
 from aiohttp import (
     web,
     ClientSession,
@@ -16,9 +16,6 @@ from aiohttp import (
     ClientTimeout,
 )
 
-DEFAULT_PYTHON_PATH = ".."
-PYTHON = os.getenv("PYTHON", sys.executable)
-START_TIMEOUT = float(os.getenv("START_TIMEOUT", 30.0))
 
 class Container:
     """Container class to represent, initialize and maintain a running docker container"""
@@ -49,17 +46,19 @@ class Container:
         self.genesis_url             = genesis_url
 
     
-    async def start_process(self, python_path: str = None, wait: bool = True):
+    async def start_process(self, wait: bool = True):
+        log_msg("Start Docker container")
+
         agent_args = self.get_process_args()
-        log_msg(f"{line_info()}Starting agent with args: {agent_args}")
-        # start agent sub-process
+        log_msg(f"Starting agent with args: {agent_args}")
         
-        self.container_process = await asyncio.create_subprocess_exec( # TODO: Catch invalid key/ arguments error.
+        self.container_process = await asyncio.create_subprocess_exec(  # TODO: Catch invalid key/ arguments error.
             *agent_args
         )
-        if wait: # Wait for agent to start up
-            await asyncio.sleep(5.0) #TODO: Timeout verplaatsen naar api handler
-       
+        if wait: 
+            await asyncio.sleep(5.0)                                    #TODO: Timeout verplaatsen naar api handler
+        log_msg("Docker container started")
+
     def get_process_args(self):
         # TODO: goed implementeren 
         # TODO: LEDGER IP !+ ENDPOINT IP (DENK IK)
@@ -91,16 +90,16 @@ class Container:
         return result
 
     async def terminate(self):
-        log_msg(f"{line_info()}Shutting down agent")
+        log_msg(f"Shutting down agent")
         
         # Check if process exists and is running
         if self.container_process and self.container_process.returncode is None:
             try:
                 self.container_process.terminate()
                 await asyncio.wait_for(self.container_process.communicate(), timeout=1)
-                log_msg(f"{line_info()}Docker Container exited with return code {self.container_process.returncode}")
+                log_msg(f"Docker Container exited with return code {self.container_process.returncode}")
             except asyncio.TimeoutError:
-                msg = f"{line_info()}Process did not terminate in time"
+                msg = f"Process did not terminate in time"
                 log_msg(msg)
                 await self.container_process.kill()
                 raise Exception(msg)

@@ -54,13 +54,13 @@ In order to run an agent, a few things are required
 Running a demo is key in understanding the blockchain interaction. For this demo, two agents are setup
 
 ### Start Agent 1
-1. `docker run --name Alice --rm -it  --entrypoint /bin/bash --network=bridge   -p 0.0.0.0:8030-8037:8030-8037   -v $(pwd):/home/indy/MNNU-Agent   -e LOG_LEVEL= -e RUNMODE=docker -e DOCKERHOST=192.168.65.3 -e AGENT_PORT=8020 -e TRACE_TARGET=log -e TRACE_TAG=acapy.events -e TRACE_ENABLED=   demo-agent:1.0`
-2. `cd MNNU_Agent/Demo`
+1. `docker run --name Alice --rm -it  --entrypoint /bin/bash --network=bridge   -p 0.0.0.0:8030-8037:8030-8037   -v $(pwd):/home/indy/MNNU-Agent   -e LOG_LEVEL= -e RUNMODE=docker -e DOCKERHOST=192.168.65.3 -e AGENT_PORT=8020 -e TRACE_TARGET=log -e TRACE_TAG=acapy.events -e TRACE_ENABLED=   mnnu-agent:0.5`
+2. `cd MNNU-Agent/Demo`
 3. `python3 demo-agent.py --port 8030 --identity Alice --ledger-ip 192.168.65.3 --seed d_000000000000000000000000Test01 --wallet-name Test01.Wallet --wallet-key test123`
 
 ### Start Agent 2
-1. `docker run --name Nathan --rm -it  --entrypoint /bin/bash --network=bridge   -p 0.0.0.0:8020-8027:8020-8027   -v $(pwd):/home/indy/MNNU-Agent   -e LOG_LEVEL= -e RUNMODE=docker -e DOCKERHOST=192.168.65.3 -e AGENT_PORT=8020 -e TRACE_TARGET=log -e TRACE_TAG=acapy.events -e TRACE_ENABLED=   demo-agent:1.0`
-2. `cd MNNU_Agent/Demo`
+1. `docker run --name Nathan --rm -it  --entrypoint /bin/bash --network=bridge   -p 0.0.0.0:8020-8027:8020-8027   -v $(pwd):/home/indy/MNNU-Agent   -e LOG_LEVEL= -e RUNMODE=docker -e DOCKERHOST=192.168.65.3 -e AGENT_PORT=8020 -e TRACE_TARGET=log -e TRACE_TAG=acapy.events -e TRACE_ENABLED=   mnnu-agent:0.5`
+2. `cd MNNU-Agent/Demo`
 3. `python3 demo-agent.py --port 8020 --identity Nathan --ledger-ip 192.168.65.3 --seed d_000000000000000000000000Test00 --wallet-name Test00.Wallet --wallet-key test123`
 
 

@@ -1,14 +1,13 @@
 import argparse
-from logger import line_info, log_msg
+from utilities import log_msg
 
-LOG_COLOR = "fg:magenta"
+LOG_COLOR = "green"
 
 
 def log_args(args):
-    log_msg(f"{line_info()}Starting Agent with args:", color=LOG_COLOR)
+    log_msg(f"Starting Agent with args:", color=LOG_COLOR)
     for arg in vars(args):
-        log_msg(f"{line_info()}\t{arg:<30}{getattr(args, arg)}", color=LOG_COLOR) #TODO: ledger port als argument toevoegen
-    log_msg(f"{line_info()}", color=LOG_COLOR)
+        log_msg(f"\t{arg:<30}{getattr(args, arg)}", color=LOG_COLOR) #TODO: ledger port als argument toevoegen
 
 
 def argument_parser(port: int = 8020):

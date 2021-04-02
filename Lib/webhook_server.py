@@ -10,7 +10,8 @@ import json
 
 from container import Container
 from api_handler import ApiHandler
-from logger import log_msg, log_timer, output_reader, default_timer, line_info, repr_json
+from logger import default_timer
+from utilities import log_msg
 from aiohttp import (
     web,
     ClientSession,
@@ -35,6 +36,7 @@ class WebhookServer():
         self.webhook_url = f"{webhook_protocol}://{webhook_ip}:{webhook_port}/webhooks"
     
     async def start_process(self):
+        log_msg("Start webhook server")
         app = web.Application()
         app.add_routes([web.post("/webhooks/topic/{topic}/", self._receive_webhook)])
         
@@ -43,6 +45,8 @@ class WebhookServer():
         
         self.webhook_site = web.TCPSite(runner, "0.0.0.0", self.webhook_port)
         await self.webhook_site.start()
+        log_msg("Webhook server started")
+
 
     async def _receive_webhook(self, request: ClientRequest):
         topic = request.match_info["topic"].replace("-", "_")
@@ -56,29 +60,30 @@ class WebhookServer():
             wallet_id = headers.get("x-wallet-id")
             method = getattr(self, handler, None)
             if method:
-                log_msg(f"{line_info()}"
+                log_msg(
                     "Agent called controller webhook: %s%s%s%s",
                     handler,
                     f"\nPOST {self.webhook_url}/topic/{topic}/",
                     (f" for wallet: {wallet_id}" if wallet_id else ""),
-                    (f" with payload: \n{repr_json(payload)}\n" if payload else ""),
+                    (f" with payload: \n{json.dumps(payload, indent=4)}\n" if payload else ""),
                 )
+
                 asyncio.get_event_loop().create_task(method(payload))
             else:
-                log_msg(f"{line_info()}"
+                log_msg(
                     f"Error: agent {self.identity} "
                     f"has no method {handler} "
                     f"to handle webhook on topic {topic}"
                 )
 
     async def handle_basicmessages(self, message):
-        log_msg(f"{line_info()}Received message:", message["content"])
+        log_msg(f"Received message:", message["content"])
     
     async def handle_connections(self, test):
         print("test", test)
     
     async def terminate(self):
-        log_msg(f"{line_info()}Shutting down web hooks site")
+        log_msg(f"Shutting down web hooks site")
         if self.webhook_site:
             await self.webhook_site.stop()
             await asyncio.sleep(0.5)

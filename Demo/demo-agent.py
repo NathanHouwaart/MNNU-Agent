@@ -9,9 +9,10 @@ sys.path.append('../Lib')
 
 from argument_parser import argument_parser, log_args
 from agent import Agent
-from logger import log_msg, line_info, prompt_loop
+from logger import prompt_loop
+from utilities import log_msg
 
-LOG_COLOR="aqua"
+LOG_COLOR="hot pink"
 
 async def main(aries_cloudagent_agent):
     """
@@ -25,24 +26,31 @@ async def main(aries_cloudagent_agent):
 2. Generate invitation\n\
 3. Receive inivtaiotn\n\
 4. Send Message\n\
-5. Exit\n")
+5. Get connection state\n\
+6. Exit\n")
     
+   
     async for option in prompt_loop(options):
+        # try:
         if int(option) == 1:
             connections = await aries_cloudagent_agent.connections()
-            log_msg(f"{line_info()}{json.dumps(connections, indent=4, sort_keys=True)}", color=LOG_COLOR)
-            log_msg(f"{line_info()}Total connections:", len(connections["results"]), color=LOG_COLOR)
+            log_msg(f"{json.dumps(connections, indent=4, sort_keys=True)}", color=LOG_COLOR)
+            log_msg(f"Total connections:", len(connections["results"]), color=LOG_COLOR)
         elif int(option) == 2:
             await aries_cloudagent_agent.generate_invitation(display_qr=True)
         elif int(option) == 3:
             await aries_cloudagent_agent.receive_invitation(invitation=None, alias=None, auto_accept=None)
         elif int(option) == 4:
             await aries_cloudagent_agent.send_message(connection_id=None, message=None)
-        elif int(option) ==5:
+        elif int(option) == 5:
+                connection_state = await aries_cloudagent_agent.get_connection_state(connection_id=None)
+                log_msg(f"Connection state", connection_state)
+        elif int(option) == 6:
             return
+        # except:
+        #     pass
     while True:
         await asyncio.sleep(1.0)
-
 
 
 
