@@ -44,7 +44,7 @@ async def main(aries_cloudagent_agent):
             await aries_cloudagent_agent.send_message(connection_id=None, message=None)
         elif int(option) == 5:
                 connection_state = await aries_cloudagent_agent.get_connection_state(connection_id=None)
-                log_msg(f"Connection state", connection_state)
+                log_msg(f"Connection state", connection_state, color=LOG_COLOR)
         elif int(option) == 6:
             return
         # except:

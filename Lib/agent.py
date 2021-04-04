@@ -154,7 +154,7 @@ class Agent:
     
     async def receive_invitation(self, invitation, alias=None, auto_accept=False):
         invitation = await prompt("Invite details: ") #TODO: Throw exception when invitation is invalid
-        auto_accept = await prompt("n/y: ") #TODO: Throw exception when invitation is invalid
+        auto_accept = await prompt("Auto accept invitation? n/y: ") #TODO: Throw exception when invitation is invalid
         if auto_accept == "y":
             auto_accept = True
         else:

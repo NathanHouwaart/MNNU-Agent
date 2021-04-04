@@ -1,19 +1,38 @@
-# Agent setup
-This readme will explain how to setup an agent for the VON-Network.
+# Docker Agent setup
+This readme will give an instruction on how to build a docker agent image by using the [Dockerfile](Dockerfile) provided.
 
-There are a few steps to follow before we are up and running.
-- Step 1 (Optional): Setup a VON-Network
-- Step 2 : Update the .env file 
-  - Update the LEDGER_URL variable to point to the URL of the ledger (this could be a local ledger (192.168.65.3:9000), or a public ledger (http://greenlight.bcovrin.vonx.io/))
-  - Update the Seed to a random 32 byte value
-  - Update the Alias to something you can recognize (eg. Test_Patient_MNNU)
-- Step 3: Run `docker-compose -f docker-compose.yml up --build`
+## Requirements
+1. Docker is installed
+2. Docker is running
+3. 1gb of free (hard)disk space
 
-After running the docker-compose command and all the correct images are pulled from the internet,
-the docker compose will first register a "DID" (Account) on the ledger you specified with the SEED variable.
+## Build
+In order to build the agent image, run the following command:
+`docker build -f Dockerfile -t mnnu-agent:0.5 .`
 
-Then, an agent will be connected to that Account that has just been created on the ledger.
+- Where the -f flag specifies the file we want to use for the build process of a docker container
+- Where the -t flag is used to give a tag to the container
 
-If everything was setup properly, the terminal will show you something similar to this screen:
+The build process should not take longer than 5 minutes to complete (based on internet speed and such).
 
-![Good Setup](../Resources/proper_setup.png "Proper Setup")
+## Verify
+In order to verify if the build went right, we are going to start a container with the freshly build image. To do so, use the following command:  
+`docker run --rm -it mnnu-agent:0.5 bash`. This should start up a container. 
+
+Then run the command `aca-py` in the bash terminal. If everything is installed correctly, the terminal should return the output as shown below.
+
+```bash
+root@ee2ac43de9fd:~# aca-py
+usage: aca-py [-h] [-v] {provision,start} ...
+
+positional arguments:
+  {provision,start}
+    provision        Provision an agent
+    start            Start a new agent process
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -v, --version      print application version and exit
+```
+
+If this succeeds, you can exit the container by entering `exit` in the bash command line.

@@ -57,7 +57,7 @@ class Container:
             *agent_args
         )
         if wait: 
-            await asyncio.sleep(5.0)                                    #TODO: Timeout verplaatsen naar api handler
+            await asyncio.sleep(10.0)                                    #TODO: Timeout verplaatsen naar api handler
         log_msg("Docker container started", color=LOG_COLOR)
 
     def get_process_args(self):
