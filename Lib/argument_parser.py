@@ -1,30 +1,39 @@
+"""
+Argument parser for the MNNU-Agent library
+
+"""
+
 import argparse
 from utilities import log_msg
 
 LOG_COLOR = "green"
 
 
-def log_args(args):
+def log_args(args) -> None:
+    """
+    Function that logs command line arguments to the terminal
+
+    :param args: A list of args
+    """
     log_msg(f"Starting Agent with args:", color=LOG_COLOR)
     for arg in vars(args):
-        log_msg(f"\t{arg:<30}{getattr(args, arg)}", color=LOG_COLOR) #TODO: ledger port als argument toevoegen
+        # TODO: ledger port als argument toevoegen
+        log_msg(f"\t{arg:<30}{getattr(args, arg)}", color=LOG_COLOR)
 
 
-def argument_parser(port: int = 8020):
+def argument_parser() -> argparse.ArgumentParser:
     """
-    Standard command-line arguements.
+    Function constructs an argument parser for the MNNU-Agent.
 
-    identity: the name of the agent that will run
-    port: the start port of the agent that will run. Note, an agent will occupy up to port+9.
+    :return: The argument parser
     """
     parser = argparse.ArgumentParser(
-        description="Runs an aries agent with a given identity on a specified portrange"
-    )
+        description="Runs an aries agent with a given identity on a specified portrange")
     parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
-    
-    #### Required arguments ####
+
+    # Required arguments #
     required.add_argument(
         "--identity",
         type=str,
@@ -35,7 +44,6 @@ def argument_parser(port: int = 8020):
     required.add_argument(
         "--port",
         type=int,
-        default=port,
         metavar=("<port>"),
         help="Choose the starting port number to listen on",
         required=True
@@ -58,11 +66,12 @@ def argument_parser(port: int = 8020):
         "--wallet-key",
         type=str,
         metavar=("<key>"),
-        help="The key of the wallet. Can be set to 'random' to generate new key'", #TODO: implement key generation
+        # TODO: implement key generation
+        help="The key of the wallet. Can be set to 'random' to generate new key'",
         required=True
     )
 
-    #### Optional Arguments ####
+    # Optional Arguments #
     optional.add_argument(
         "--public-did",
         action="store_true",
@@ -86,8 +95,8 @@ def argument_parser(port: int = 8020):
         help="Use DID-Exchange protocol for connections",
     )
     optional.add_argument(
-        "--revocation", 
-        action="store_true", 
+        "--revocation",
+        action="store_true",
         help="Enable credential revocation"
     )
     optional.add_argument(
@@ -97,18 +106,18 @@ def argument_parser(port: int = 8020):
         help="Tals server base url",
     )
     optional.add_argument(
-        "--timing", 
-        action="store_true", 
+        "--timing",
+        action="store_true",
         help="Enable timing information"
     )
     optional.add_argument(
-        "--multitenant", 
-        action="store_true", 
+        "--multitenant",
+        action="store_true",
         help="Enable multitenancy options"
     )
     optional.add_argument(
-        "--mediation", 
-        action="store_true", 
+        "--mediation",
+        action="store_true",
         help="Enable mediation functionality"
     )
     optional.add_argument(
