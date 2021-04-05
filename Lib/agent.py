@@ -8,8 +8,7 @@ from qrcode import QRCode
 from container import Container
 from api_handler import ApiHandler
 from webhook_server import WebhookServer
-from logger import *
-from utilities import log_msg
+from utilities import log_msg, prompt, prompt_loop
 from aiohttp import (
     web,
     ClientSession,

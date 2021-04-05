@@ -9,10 +9,10 @@ sys.path.append('../Lib')
 
 from argument_parser import argument_parser, log_args
 from agent import Agent
-from logger import prompt_loop
-from utilities import log_msg
+from utilities import log_msg, prompt_loop
 
-LOG_COLOR="hot pink"
+LOG_COLOR = "hot pink"
+
 
 async def main(aries_cloudagent_agent):
     """
@@ -21,14 +21,8 @@ async def main(aries_cloudagent_agent):
     """
     await aries_cloudagent_agent.initialize()
 
-    options =  (
-"1. Show Connections\n\
-2. Generate invitation\n\
-3. Receive inivtaiotn\n\
-4. Send Message\n\
-5. Get connection state\n\
-6. Exit\n")
-    
+    options = ("1. Show Connections\n2. Generate invitation\n3. Receive inivtaiotn\n4. Send Message\n5. Get connection state\n6. Exit\n")
+
     await asyncio.sleep(1.0)
     async for option in prompt_loop(options):
         # try:
@@ -43,8 +37,8 @@ async def main(aries_cloudagent_agent):
         elif int(option) == 4:
             await aries_cloudagent_agent.send_message(connection_id=None, message=None)
         elif int(option) == 5:
-                connection_state = await aries_cloudagent_agent.get_connection_state(connection_id=None)
-                log_msg(f"Connection state", connection_state, color=LOG_COLOR)
+            connection_state = await aries_cloudagent_agent.get_connection_state(connection_id=None)
+            log_msg(f"Connection state", connection_state, color=LOG_COLOR)
         elif int(option) == 6:
             return
         # except:
@@ -53,16 +47,15 @@ async def main(aries_cloudagent_agent):
         await asyncio.sleep(1.0)
 
 
-
 if __name__ == "__main__":
     """
-    Entrypoint of application 
+    Entrypoint of application
     """
 
     parser = argument_parser()
     args = parser.parse_args()
     log_args(args)
-    
+
     # Construct Aries cloud agent object
     aries_cloudagent_agent = Agent(
         identity=args.identity,
@@ -76,7 +69,7 @@ if __name__ == "__main__":
         public_did=args.public_did,
         auto_response=args.no_auto
     )
-    
+
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main(aries_cloudagent_agent))
@@ -89,4 +82,3 @@ if __name__ == "__main__":
         loop.run_until_complete(aries_cloudagent_agent.terminate())
         loop.close()
         os._exit(1)
-    
