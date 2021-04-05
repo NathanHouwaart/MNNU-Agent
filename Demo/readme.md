@@ -3,15 +3,30 @@ This demo will help you set-up your own MNNU-Agents that interact with a local l
 
 ## Requirements
 In order to run an agent, a few things are required
-1. Git (bash)
+1. Git (bash), WSL or linux
 2. Docker
-3. A working internet conneciton
-4. A running local von Image
+3. A working internet connection
 
 ## Run Demo
 The following steps will help you set-up and run the demo
 ### Setup VON-Network
-TODO: readme updaten hier
+A VON-Network ([Verifiable Organisations Network](https://vonx.io/)) is needed to store any kind of information regarding wallets and issued credentials. A public VON-Network is available for testing called the [Greenlight Ledger Indy Network](http://greenlight.bcovrin.vonx.io/). The Indy Network Ledger looks like the image below:
+
+![GreenLight_Ledger_Indy_Network](../Resources/GreenLight_Ledger_Indy_Network.png)
+
+You can see that this network constist of a total of four validator nodes which validate the data on the blockhain. Then, you can also register a new DID (aka, a new wallet), get the genesis transaction file and browse the ledger to see what data is stored on it. Browsing the ledger can be done by pressing the **Domain** button located under **Ledger State**. This feature is very important during this demo, because you will be able to explore what effect certain operations have on the blockhain. There is one downside to this public test ledger however, and that is that data on the website is not updated instantly. This could result in you needing to wait a few hours before data becomes visible on this web page. Dont get me wrong, data is instantly stored on the ledger when an agent does so, but you cannot view it directly when browsing the ledger itself.
+
+To circumvent this, we will use a local VON-Network. It looks just like the public one we have just looked at, but works locally on your pc. One major benefit of this is that your browser and ledger will instantly update, making it easier to debug what your code just did. To setup the VON-Network, we will use the open source code provided on this [Github Page](https://github.com/bcgov/von-network). It is the exact same code that is running the [Greenlight Ledger Indy Network](http://greenlight.bcovrin.vonx.io/).
+1. Open a linux based terminal (git bash, wsl, etc.)
+2. Clone the github repo with `git clone https://github.com/bcgov/von-network`
+3. cd to the directory using `cd von-network`
+4. start the von network using the command `./manage start --logs`
+5. Wait for the terminal output to slow down and stop.
+6. Navigate to http://localhost:9000. This should now show the local indy network (notice the **Local** in the top right corner): <details><summary>Local GreenLight Ledger Indy Network</summary><img src="../Resources/Local_GreenLight_Ledger_Indy_Network.png" alt="Local_GreenLight_Ledger_Indy_Network.png"></details>
+7. The VON-Network is now setup and can now browse the local ledger.
+8. Notice that when you navigate to the **Domain** page located under **Ledger State**, you can see that there are only 5 entries on the ledger. <details><summary>Local GreenLight Ledger Indy Network Domain</summary><img src="../Resources/Local_GreenLight_Ledger_Indy_Network_Domain.png" alt="Local_GreenLight_Ledger_Indy_Network_Domain.png"></details>
+
+This will be our bassline for the rest of this demo.
 
 ### Setup Agents
 1. In order to run the Demo, you must have build a Docker image with the provided [Dockerfile](../Docker/Dockerfile). The [readme](../Docker/readme.md) in the [Docker](../Docker/) directory will show you how to to that.
@@ -28,10 +43,12 @@ TODO: readme updaten hier
     - Navigate to the Demo directory using the `cd MNNU-Agent/Demo` directory
     - Run the agent with the following command `python3 demo-agent.py --port 8020 --identity Alice --ledger-ip 192.168.65.3 --seed d_000000000000000000000000Test01 --wallet-name Test01.Wallet --wallet-key test123`. 
     - **Note** that the --port parameter specified matches the beginning of the exposed Docker container ports we specified during the container startup.
+    - Navigate to the domain page of the [local VON-Network](http://localhost:9000/browse/domain). Notice that a record has been added to the ledger that contains the registration of the Alice wallet. <details><summary>Registration of Alice wallet on Ledger</summary><img src="../Resources/Alice_NYM_Local_Ledger.png" alt="Alice_NYM_Local_Ledger.png"></details>
 4. Then Start up a docker container for agent 2 with the following command: `docker run --name Nathan --rm -it -p 0.0.0.0:8030-8037:8030-8037   -v $(pwd):/home/indy/MNNU-Agent mnnu-agent:0.5 bash`
     - Navigate to the Demo directory using the `cd MNNU-Agent/Demo` directory
     - Run the agent with the following command `python3 demo-agent.py --port 8030 --identity Nathan --ledger-ip 192.168.65.3 --seed d_000000000000000000000000Test00 --wallet-name Test00.Wallet --wallet-key test123`. 
     - **Note** that the --port parameter specified matches the beginning of the exposed Docker container ports we specified during the container startup.
+    - Navigate to the domain page of the [local VON-Network](http://localhost:9000/browse/domain). Notice that a record has been added to the ledger that contains the registration of the Nathan wallet. <details><summary>Registration of Nathan wallet on Ledger</summary><img src="../Resources/Nathan_NYM_Local_Ledger.png" alt="Nathan_NYM_Local_Ledger.png"></details>
 5. With both agents running, the command line terminal of both agents should look something like this
     - Alice agent: [output file](../Resources/Alice_Agent_startup_output.md)
     - Nathan agent: [output file](../Resources/Nathan_Agent_startup_output.md)
@@ -133,12 +150,9 @@ demo-agent.py:38                |  Total connections: 1
 #### 2. Generate invitations
 This option is used to generate an invitation to initiate a new connection with an agent. if this option is selected, the terminal will spit out a bunch of things. First, it will show the invitation data, which looks like a large string of random charcters. Then, a QR-Code is printed out, which could be used to scan with a phone. Lastly, the webhook server will generate a callback which is logged to the console. 
 
-Remember the architecture of an Aries Agent? Where the controller makes API calls to the framework and the framework will send events to the controller (explained in this [readme](../readme.md))? Well, in this case, the controller sends a request to the Aries Framework to generate an invitation. This can be found in the following files [agent.py](../Lib/agent.py) and [api_handler.py](../Lib/api_handler.py). The framework will do its magic and generates an invitation. 
-
-However, in order to communicate that information back to our contoller, the framework will generate an event. This is where the webhook server comes in. The webhook server will listen for incoming events and tries to handle them accordingly. In this case, it will just print the information out to the terminal. 
+Remember the architecture of an Aries Agent? Where the controller makes API calls to the framework and the framework will send events to the controller (explained in this [readme](../readme.md))? Well, in this case, the controller sends a request to the Aries Framework to generate an invitation. This can be found in the following files [agent.py](../Lib/agent.py) and [api_handler.py](../Lib/api_handler.py). The framework will do its magic and generates an invitation. However, in order to communicate that information back to our contoller, the framework will generate an event. This is where the webhook server comes in. The webhook server will listen for incoming events and tries to handle them accordingly. In this case, it will just print the information out to the terminal. 
 
 The terminal output when generating an invitation should look somrthing like this (could be different when using a different seed):
-
 ```console
 http://192.168.65.3:8021/connections/create-invitation {'alias': 'Alice', 'auto_accept': 'true', 'multi_use': 'false'}
 agent.py:119                    |  Use the following JSON to accept the invite from another demo agent. Or use the QR code to connect from a mobile agent. 
