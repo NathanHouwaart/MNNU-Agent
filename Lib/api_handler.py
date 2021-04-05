@@ -28,11 +28,13 @@ states = {
 
 
 # TODO: Error checking
-# TODO: Check if this class can be ran inside a thread so the program doesn't hang when ACA-PY instance is offline
+# TODO: Check if this class can be ran inside a thread so the program
+# doesn't hang when ACA-PY instance is offline
 class ApiHandler:
     def __init__(self, transport_protocol: str, api_url: str, port: int):
         """
         ApiHandler constructor
+
         :param api_url: The ACA-Py instance url as a str
         :param port: The ACA-Py instance port as a int
         """
@@ -42,6 +44,7 @@ class ApiHandler:
     def format_bool(x: bool) -> str:
         """
         Format bool as a str
+
         :param x: The bool
         :return: The bool as a str
         """
@@ -50,15 +53,17 @@ class ApiHandler:
     def set_url(self, api_url: str, port: int) -> None:
         """
         Configure the ACA-Py instance url and port
+
         :param api_url: The url as a str
         :param port: The port as a int
         :return: None
         """
         self.__api_url = f"http://{api_url}:{port}"
 
-    def test_connection(self) -> bool: #TODO: Set timeout for test connection
+    def test_connection(self) -> bool:  # TODO: Set timeout for test connection
         """
         Test the connection with the ACA-Py instance
+
         :return: True if the connection is successful, False if not
         """
         try:
@@ -69,8 +74,15 @@ class ApiHandler:
         except requests.exceptions.ConnectionError as e:
             print("connection refused")
             return False
-    
-    def send_message(self, connection_id: str, message: str) -> None:
+
+    def send_message(self, connection_id: str, message: str) -> dict:
+        """
+        Send a message to another connected agent
+
+        :param connection_id: The connection id of the connection between this agent and the connected agent
+        :param message: Message to send to the other agent
+        :return: Response of the operation
+        """
         headers = {
             'accept': 'application/json',
             'Content-Type': 'application/json'
@@ -80,45 +92,62 @@ class ApiHandler:
             "content": f"{message}"
         }
 
-        response = requests.post(f"{self.__api_url}/connections/{connection_id}/send-message", headers=headers, json=data)
+        response = requests.post(
+            f"{self.__api_url}/connections/{connection_id}/send-message",
+            headers=headers,
+            json=data)
         return response
 
-    def connections(self, *,alias_query: str=None, invitation_key_query: str=None, my_did_query: str=None, connection_state_query: str=None, their_did_query: str=None, their_role_query: str=None) -> dict:
+    def connections(
+            self,
+            *,
+            alias_query: str = None,
+            invitation_key_query: str = None,
+            my_did_query: str = None,
+            connection_state_query: str = None,
+            their_did_query: str = None,
+            their_role_query: str = None) -> dict:
         """
         List and Query agent-to-agent connections
-        
+
         Function can be called with no KWARGS to list ALL conenctions
         Function can also be called with KWARGS to query the list of connections
 
-        :alias_query: Only list connections with this alias
-        :invitation_key_query: Only list connections with this invitation key
-        :my_did_query: Only list connections with this "my did" value
-        :connection_state_query: Only list connections with this connection state
-        :their_did_query: Only list connections with this "their did" value
-        :their_role_query: Only list connections with this "their role" value
+        :param alias_query: Only list connections with this alias
+        :param invitation_key_query: Only list connections with this invitation key
+        :param my_did_query: Only list connections with this "my did" value
+        :param connection_state_query: Only list connections with this connection state
+        :param their_did_query: Only list connections with this "their did" value
+        :param their_role_query: Only list connections with this "their role" value
         :return: Queried list of agent-to-agent connections with their states
         """
-        string = re.sub("\&&+", "",
+        string = re.sub(
+            "\\&&+",
+            "",
             "?{}&{}&{}&{}&{}&{}".format(
-            f"alias={alias_query}"                   if alias_query            is not None else "",
-            f"invitation_key={invitation_key_query}" if invitation_key_query   is not None else "",
-            f"my_did={my_did_query}"                 if my_did_query           is not None else "",
-            f"state={connection_state_query}"        if connection_state_query is not None else "",
-            f"their_did={their_did_query}"           if their_did_query        is not None else "",
-            f"their_role={their_role_query}"         if their_role_query       is not None else ""
-        ))
-        if(string=="?"): string = ""
-        
+                f"alias={alias_query}" if alias_query is not None else "",
+                f"invitation_key={invitation_key_query}" if invitation_key_query is not None else "",
+                f"my_did={my_did_query}" if my_did_query is not None else "",
+                f"state={connection_state_query}" if connection_state_query is not None else "",
+                f"their_did={their_did_query}" if their_did_query is not None else "",
+                f"their_role={their_role_query}" if their_role_query is not None else ""))
+        if(string == "?"):
+            string = ""
+
         headers = {
             'accept': 'application/json',
         }
 
-        response = requests.get(f'{self.__api_url}/connections{string}', headers=headers) #TODO: hardcoded
+        response = requests.get(
+            f'{self.__api_url}/connections{string}',
+            headers=headers)  # TODO: hardcoded
         return response.json()
 
-    def create_invitation(self, alias: str, multi_use: bool, auto_accept: bool) -> Tuple[str, str]:
+    def create_invitation(self, alias: str, multi_use: bool,
+                          auto_accept: bool) -> Tuple[str, str]:
         """
         Create a connection invitation
+
         :param alias: The alias to give to the connection as a str
         :param multi_use: Can this invite be used multiple times?
         :param auto_accept: Auto accept connection handshake?
@@ -130,55 +159,74 @@ class ApiHandler:
             "multi_use": f"{self.format_bool(multi_use)}"
         }
         print(f"{self.__api_url}{endpoints['create_invitation']}", params)
-        response = requests.post(f"{self.__api_url}{endpoints['create_invitation']}", params=params).json()
+        response = requests.post(
+            f"{self.__api_url}{endpoints['create_invitation']}",
+            params=params).json()
         # Return the connection id and decoded invitation url
-        return response['connection_id'], response['invitation_url'].split("c_i=")[1]
+        return response['connection_id'], response['invitation_url'].split("c_i=")[
+            1]
 
-    def receive_invitation(self, invitation_url: str, alias: str, auto_accept: bool) -> str:
+    def receive_invitation(
+            self,
+            invitation_url: str,
+            alias: str,
+            auto_accept: bool) -> str:
         """
         Receive invitation url
+
         :param invitation_url: The base64 encoded invite url str
         :param alias: The alias to give to the connection as a str
         :param auto_accept: Auto accept connection handshake?
         :return: The connection id as a str
         """
-        params = {"alias": alias, "auto_accept": f"{self.format_bool(auto_accept)}"}
-        decoded_url = ast.literal_eval(base64.b64decode(invitation_url).decode('utf-8'))
+        params = {"alias": alias,
+                  "auto_accept": f"{self.format_bool(auto_accept)}"}
+        decoded_url = ast.literal_eval(
+            base64.b64decode(invitation_url).decode('utf-8'))
 
         response = requests.post(
-            f"{self.__api_url}{endpoints['receive_invitation']}", params=params, json=decoded_url)
+            f"{self.__api_url}{endpoints['receive_invitation']}",
+            params=params,
+            json=decoded_url)
         return response.json()['connection_id']
 
     def accept_invitation(self, conn_id: str) -> None:
         """
         Accept the invitation of the given conn id
+
         This needs to be done when auto-accept is disabled and only needs to be done by the receiver of the invitation
         :param conn_id: The connection id of the connection to accept
         :return: None
         """
-        requests.post(f"{self.__api_url}{endpoints['base_connections']}{conn_id}{endpoints['accept_invitation']}")
+        requests.post(
+            f"{self.__api_url}{endpoints['base_connections']}{conn_id}{endpoints['accept_invitation']}")
 
     def accept_request(self, conn_id: str) -> None:
         """
         Accept the connection request of the given conn id
+
         This needs to be done when auto-accept is disabled and only needs to be done by the invitation creator
         :param conn_id: The connection id of the connection to accept
         :return: None
         """
-        requests.post(f"{self.__api_url}{endpoints['base_connections']}{conn_id}{endpoints['accept_request']}")
+        requests.post(
+            f"{self.__api_url}{endpoints['base_connections']}{conn_id}{endpoints['accept_request']}")
 
     def get_connection_state(self, connection_id: str) -> int:
         """
         Get the connection state of a given connection id
+
         :param connection_id: The connection id
         :return: The state (see states dict)
         """
-        response = requests.get(f"{self.__api_url}/connections/{connection_id}").json()
+        response = requests.get(
+            f"{self.__api_url}/connections/{connection_id}").json()
         return states[response['state']]
 
     def get_agent_name(self) -> str:
         """
         Get the ACA-Py agent name
+
         :return: The agent name as a str
         """
         return requests.get(f"{self.__api_url}/status").json()["label"]
@@ -186,6 +234,7 @@ class ApiHandler:
     def get_connections(self, alias: str = None, state: str = None) -> dict:
         """
         Get connection(s) by: alias, state or if both are left empty every connection
+
         :param alias: The alias to retrieve (optional)
         :param state: The state the connection needs to be in (optional), see states dict for possible options
         :return: A dict with the requested connections
@@ -195,11 +244,14 @@ class ApiHandler:
             params["alias"] = alias
         if state:
             params["state"] = state
-        return requests.get(f"{self.__api_url}/connections", params=params).json()
+        return requests.get(
+            f"{self.__api_url}/connections",
+            params=params).json()
 
     def get_connection_id(self, alias: str) -> str:
         """
         Get the connection id of a given alias
+
         :param alias: The requested connection id alias as a str
         :return: The connection id as a str
         """
@@ -208,6 +260,7 @@ class ApiHandler:
     def get_active_connection_aliases(self) -> list:
         """
         Retrieve the aliases of all active connections
+
         :return: The aliases inside a list
         """
         aliases = []
@@ -226,6 +279,7 @@ class ApiHandler:
     def get_alias_by_conn_id(self, conn_id: str) -> Union[str, None]:
         """
         Get the alias of the given connection id
+
         :param conn_id: The connnection id where the alias needs to be retreived from
         :return: The alias as a str if found, None if not
         """
@@ -238,6 +292,7 @@ class ApiHandler:
     def get_pending_connections(self) -> list:
         """
         Retrieve all pending connections
+
         :return: All pending connections (state=invitation) inside a list
         """
         pending = []
@@ -256,13 +311,15 @@ class ApiHandler:
     def delete_connection(self, conn_id: str) -> bool:
         """
         Delete the connection with a given connection id
+
         :param conn_id: The connection id to delete
         :return: True if deletion is successful, False if not
         """
         # TODO: Check if there are any left over records corresponding to this connection id
         # Delete proof records corresponding to the connection id
         self.delete_proof_records(conn_id)
-        response = requests.delete(f"{self.__api_url}{endpoints['base_connections']}{conn_id}")
+        response = requests.delete(
+            f"{self.__api_url}{endpoints['base_connections']}{conn_id}")
         if response.status_code == 200:
             return True
         return False
@@ -270,13 +327,15 @@ class ApiHandler:
     def delete_proof_records(self, conn_id: str) -> bool:
         """
         Delete all proof records corresponding to a certain connection id
+
         :param conn_id: The connection id to delete the records of
         :return: None
         """
         records = self.get_proof_records(state="", role="", conn_id=conn_id)
         response = None
         for record in records:
-            response = requests.delete(f"{self.__api_url}{endpoints['base_proof']}/{record['pres_ex_id']}")
+            response = requests.delete(
+                f"{self.__api_url}{endpoints['base_proof']}/{record['pres_ex_id']}")
         if response.status_code == 200:
             return True
         return False
@@ -284,6 +343,7 @@ class ApiHandler:
     def create_schema(self, schema: dict) -> dict:
         """
         Create a schema on the ACA-Py instance
+
         :param schema: The schema to create
         :return: The created schema as a dict
         """
@@ -293,14 +353,21 @@ class ApiHandler:
     def get_schemas(self) -> list:
         """
         Get all schema's that are available on the ACA-Py instance
+
         :return: The schema's a a list
         """
-        response = requests.get(f"{self.__api_url}/schemas/created").json()['schema_ids']
+        response = requests.get(
+            f"{self.__api_url}/schemas/created").json()['schema_ids']
         return response
 
-    def create_credential_definition(self, schema_id: str, schema_tag: str, support_revocation: bool = False) -> str:
+    def create_credential_definition(
+            self,
+            schema_id: str,
+            schema_tag: str,
+            support_revocation: bool = False) -> str:
         """
         Create a credential definition with the given schema id and schema tag, with optional revocation support
+
         NOTE: This function takes some time to execute might look like program is hanging
         :param schema_id: The schema id as a str
         :param schema_tag: The schema tag as a str
@@ -314,16 +381,29 @@ class ApiHandler:
         if support_revocation:
             cred_def["revocation_registry_size"] = 1000
             cred_def["support_revocation"] = "true"
-        response = requests.post(f"{self.__api_url}/credential-definitions", json=cred_def, timeout=60)
+        response = requests.post(
+            f"{self.__api_url}/credential-definitions",
+            json=cred_def,
+            timeout=60)
         # retry creating credential definition if response code is not 200
         # because of weird ACA-PY error 400 bug
         while response.status_code != 200:
-            response = requests.post(f"{self.__api_url}/credential-definitions", json=cred_def, timeout=60)
+            response = requests.post(
+                f"{self.__api_url}/credential-definitions",
+                json=cred_def,
+                timeout=60)
         return response.json()["credential_definition_id"]
 
-    def issue_credential(self, conn_id: str, cred_def_id: str, attributes: list, schema: dict, comment: str = "") -> dict:
+    def issue_credential(
+            self,
+            conn_id: str,
+            cred_def_id: str,
+            attributes: list,
+            schema: dict,
+            comment: str = "") -> dict:
         """
         Issue a credential
+
         :param conn_id: The connection id to issue the credential to
         :param cred_def_id: The credential definition id
         :param attributes: The list of attributes, format: [{"name": "score", "value": "12"},...]
@@ -349,19 +429,30 @@ class ApiHandler:
             "schema_version": schema["version"],
             "trace": "false"
         }
-        return requests.post(f"{self.__api_url}{endpoints['issue_credential']}", json=credential).json()
+        return requests.post(
+            f"{self.__api_url}{endpoints['issue_credential']}",
+            json=credential).json()
 
     def get_credentials(self) -> dict:
         """
         Get the credentials of the ACA-Py instance
+
         :return: The credentials inside a dict
         """
-        response = requests.get(f"{self.__api_url}{endpoints['get_credentials']}")
+        response = requests.get(
+            f"{self.__api_url}{endpoints['get_credentials']}")
         return response.json()
 
-    def send_proof_request(self, conn_id: str, requested_attributes: dict, requested_predicates: dict, name: str, comment: str) -> str:
+    def send_proof_request(
+            self,
+            conn_id: str,
+            requested_attributes: dict,
+            requested_predicates: dict,
+            name: str,
+            comment: str) -> str:
         """
         Send a request for proof
+
         :param conn_id: The connection id of the connection where you wish to send the request to
         :param requested_attributes: The requested attributes where you want proof for
         :param requested_predicates: The requests predicates where you want proof for (optional, supply empty dict)
@@ -380,17 +471,21 @@ class ApiHandler:
             },
             "trace": "false"
         }
-        response = requests.post(f"{self.__api_url}{endpoints['send_proposal']}", json=proposal)
+        response = requests.post(
+            f"{self.__api_url}{endpoints['send_proposal']}", json=proposal)
         return response.json()['presentation_exchange_id']
 
     def get_pending_proof_requests_send(self) -> list:
         """
         Get a list of pending proof requests that have been send
+
         :return: A list containing the pending proof requests
         """
         pending_req = []
         params = {"role": "verifier", "state": "request_sent"}
-        response = requests.get(f"{self.__api_url}{endpoints['base_proof']}", params=params).json()["results"]
+        response = requests.get(
+            f"{self.__api_url}{endpoints['base_proof']}",
+            params=params).json()["results"]
         for i in response:
             pending_req.append({
                 "name": i["presentation_request"]["name"],
@@ -403,6 +498,7 @@ class ApiHandler:
     def get_verified_proof_records(self, conn_id: str) -> dict:
         """
         Get a dict of verified proof records
+
         :param conn_id: The connection id where the proof records originated from
         :return: A dict with all the proof records from a given connection id
         """
@@ -412,7 +508,9 @@ class ApiHandler:
             "state": "verified",
             "role": "verifier"
         }
-        response = requests.get(f"{self.__api_url}{endpoints['base_proof']}", params=params).json()["results"]
+        response = requests.get(
+            f"{self.__api_url}{endpoints['base_proof']}",
+            params=params).json()["results"]
         for result in response:
             name = result["presentation_request"]["name"].split(":")[0]
             revealed_attrs = result["presentation"]["requested_proof"]["revealed_attrs"]
@@ -422,9 +520,14 @@ class ApiHandler:
             records[name] = attributes
         return records
 
-    def get_proof_records(self, state: str, role: str = "verifier", conn_id: str = None) -> list:
+    def get_proof_records(
+            self,
+            state: str,
+            role: str = "verifier",
+            conn_id: str = None) -> list:
         """
         Get all proof records with a certain state
+
         :param state: The state of the proof record
         :param role: The role of our client default = verifier
         :param conn_id: Optional, retreive only records corresponding with a certain connection id
@@ -438,7 +541,9 @@ class ApiHandler:
             params["state"] = state
         if role:
             params["role"] = role
-        response = requests.get(f"{self.__api_url}{endpoints['base_proof']}", params=params).json()["results"]
+        response = requests.get(
+            f"{self.__api_url}{endpoints['base_proof']}",
+            params=params).json()["results"]
         for i in response:
             records.append({
                 "connection_id": i["connection_id"],
@@ -452,14 +557,19 @@ class ApiHandler:
     def get_pres_exchange_id(self) -> str:
         """
         Get the first presentation exchange id from the response
+
         TODO: Refactor this function since it is hardcoded to always return the first response
         :return: The presentation exchange id as a string
         """
         response = requests.get(f"{self.__api_url}{endpoints['base_proof']}")
         return response.json()['results'][0]['presentation_exchange_id']
 
-    def send_presentation(self, pres_ex_id: str, requested_attributes: dict, requested_predicates: dict,
-                          self_attested_attributes: dict) -> dict:
+    def send_presentation(
+            self,
+            pres_ex_id: str,
+            requested_attributes: dict,
+            requested_predicates: dict,
+            self_attested_attributes: dict) -> dict:
         """
         Send a presentation as a response from a proof request
         :param pres_ex_id: The presentation exchange id of the originating proof request
@@ -482,7 +592,8 @@ class ApiHandler:
     def verify_presentation(self, pres_ex_id: str) -> dict:
         """
         Verify a received presentation
-        :param pres_ex_id: The corresponding presentation exchange id you wish to verify
+
+        :param pres_ex_id:  The corresponding presentation exchange id you wish to verify
         :return: The verify presentation json response
         """
         return requests.post(
