@@ -1,5 +1,5 @@
-# Local MNNU-Agent demo
-This demo will help you set-up your own local MNNU-Agents that interact with a local ledger. We connect with a local ledger instead of a public one, because a local ledger will instantly update its webpage, so you can directly see what effects your commands have on a ledger. A public ledger should not behave any different, besides the instantaniousnes of the website.
+# MNNU-Agent demo
+This demo will help you set-up your own MNNU-Agents that interact with a local ledger. We connect with a local ledger instead of a public one, because a local ledger will instantly update its webpage, so you can directly see what effects your commands have on a ledger. A public ledger should not behave any different, besides the instantaniousnes of the website.
 
 ## Requirements
 In order to run an agent, a few things are required
