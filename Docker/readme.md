@@ -7,7 +7,7 @@ This readme will give an instruction on how to build a docker agent image by usi
 3. 1gb of free (hard)disk space
 
 ## Build
-In order to build the agent image, run the following command:
+In order to build the agent image, navigate to the [Docker](../Docker) directory and run the following command:
 `docker build -f Dockerfile -t mnnu-agent:0.5 .`
 
 - Where the -f flag specifies the file we want to use for the build process of a docker container

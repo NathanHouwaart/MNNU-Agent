@@ -1,0 +1,1 @@
+# Resources for readme files

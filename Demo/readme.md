@@ -6,6 +6,7 @@ In order to run an agent, a few things are required
 1. Git (bash), WSL or linux
 2. Docker
 3. A working internet connection
+4. A docker image build with the [Dockerfile](../Docker/Dockerfile) in the [Docker](../Docker) directory. The [readme](../Docker/readme.md) shows you how
 
 ## Run Demo
 The following steps will help you set-up and run the demo
@@ -297,7 +298,7 @@ webhook_server.py:92            |  Received message: Alice.Agent received your m
 ```
 
 #### 5. Get connection state
-
+Todo...
 
 
 #### 6. Exit

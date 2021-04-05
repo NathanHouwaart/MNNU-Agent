@@ -1,6 +1,9 @@
 # MNNU-Agent Python
 This repository contains all the modules and tools needed to setup one or multiple cloud based agent containers.
 
+**Special Note**: If you are having a hard time gasping the concepts of a VON-Network, Verifiable Credentials and SSI, it is highly reccomended you checkout the following course: https://training.linuxfoundation.org/training/becoming-a-hyperledger-aries-developer-lfs173/
+This couse will help you understand the basics of SSI, Aries Cloud Agent and Verifiable credentials.
+
 #
 ## What is an agent? 
 An agent is a piece of software used to represent an individual or organisation in the digital world. This could for example be a mobile agent running on a smartphone for an individual, or a cloud based agent for an organisation. An agent helps individuals or organisations to securely interact with a ledger to store credentials, receive credentials, interact with other agents and much more. All agents (with rare exceptions) have secure storage for securing identity-related data including DIDs, keys and verifiable credentials. 
