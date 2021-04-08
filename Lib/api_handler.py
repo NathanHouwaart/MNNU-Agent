@@ -31,7 +31,7 @@ states = {
 # TODO: Check if this class can be ran inside a thread so the program
 # doesn't hang when ACA-PY instance is offline
 class ApiHandler:
-    def __init__(self, transport_protocol: str, api_url: str, port: int):
+    def __init__(self, api_url: str, port: int):
         """
         ApiHandler constructor
 

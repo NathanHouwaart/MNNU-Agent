@@ -49,10 +49,17 @@ def argument_parser() -> argparse.ArgumentParser:
         required=True
     )
     required.add_argument(
-        "--ledger-ip",
+        "--ledger-url",
         type=str,
-        metavar=("<ledger-ip>"),
+        metavar=("<ledger-url>"),
         help="The url of the ledger",
+        required=True
+    )
+    required.add_argument(
+        "--local-ip",
+        type=str,
+        metavar=("<local-ip>"),
+        help="The local ip of the admin api and webook server",
         required=True
     )
     required.add_argument(

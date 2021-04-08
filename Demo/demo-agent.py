@@ -61,8 +61,8 @@ if __name__ == "__main__":
         identity=args.identity,
         start_port=args.port,
         transport_protocol=args.transport_protocol,
-        ledger_ip=args.ledger_ip,       # Check of dit goed gaat bij een publieke ledger
-        ledger_port=9000,               # TODO: is dit nodig? bij een publieke ledger staat er geen port achter de url.
+        ledger_url=args.ledger_url,       # Check of dit goed gaat bij een publieke ledger
+        local_ip=args.local_ip,
         wallet_name=args.wallet_name,
         wallet_key=args.wallet_key,
         seed=args.seed,

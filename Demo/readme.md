@@ -42,12 +42,12 @@ This will be our bassline for the rest of this demo.
     - We have mounted the MNNU-Agent repository to the /home/indy/MNNU-Agent directory
 3. Start up a docker container for agent 1 with the following command: `docker run --name Alice --rm -it -p 0.0.0.0:8020-8027:8020-8027 -v $(pwd):/home/indy/MNNU-Agent mnnu-agent:0.5 bash`
     - Navigate to the Demo directory using the `cd MNNU-Agent/Demo` directory
-    - Run the agent with the following command `python3 demo-agent.py --port 8020 --identity Alice --ledger-ip 192.168.65.3 --seed d_000000000000000000000000Test01 --wallet-name Test01.Wallet --wallet-key test123`. 
+    - Run the agent with the following command `python3 demo-agent.py --port 8020 --identity Alice --ledger-url http://192.168.65.3:9000 --local-ip 192.168.65.3 --seed d_000000000000000000000000Test01 --wallet-name Test01.Wallet --wallet-key test123`. 
     - **Note** that the --port parameter specified matches the beginning of the exposed Docker container ports we specified during the container startup.
     - Navigate to the domain page of the [local VON-Network](http://localhost:9000/browse/domain). Notice that a record has been added to the ledger that contains the registration of the Alice wallet. <details><summary>Registration of Alice wallet on Ledger</summary><img src="../Resources/Alice_NYM_Local_Ledger.png" alt="Alice_NYM_Local_Ledger.png"></details>
 4. Then Start up a docker container for agent 2 with the following command: `docker run --name Nathan --rm -it -p 0.0.0.0:8030-8037:8030-8037   -v $(pwd):/home/indy/MNNU-Agent mnnu-agent:0.5 bash`
     - Navigate to the Demo directory using the `cd MNNU-Agent/Demo` directory
-    - Run the agent with the following command `python3 demo-agent.py --port 8030 --identity Nathan --ledger-ip 192.168.65.3 --seed d_000000000000000000000000Test00 --wallet-name Test00.Wallet --wallet-key test123`. 
+    - Run the agent with the following command `python3 demo-agent.py --port 8030 --identity Nathan --ledger-url http://192.168.65.3:9000 --local-ip 192.168.65.3 --seed d_000000000000000000000000Test00 --wallet-name Test00.Wallet --wallet-key test123`. 
     - **Note** that the --port parameter specified matches the beginning of the exposed Docker container ports we specified during the container startup.
     - Navigate to the domain page of the [local VON-Network](http://localhost:9000/browse/domain). Notice that a record has been added to the ledger that contains the registration of the Nathan wallet. <details><summary>Registration of Nathan wallet on Ledger</summary><img src="../Resources/Nathan_NYM_Local_Ledger.png" alt="Nathan_NYM_Local_Ledger.png"></details>
 5. With both agents running, the command line terminal of both agents should look something like this
