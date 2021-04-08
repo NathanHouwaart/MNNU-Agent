@@ -30,7 +30,9 @@ class WebhookServer():
         webhook_ip,
         webhook_protocol,
         webhook_port,
+        api_handler
     ):
+        self.api_handler = api_handler
         self.identity = identity
         self.webhook_ip = webhook_ip
         self.webhook_protocol = webhook_protocol
@@ -65,7 +67,11 @@ class WebhookServer():
         return web.Response(status=200)
 
     async def handle_webhook(self, topic: str, payload, headers: dict):
-        """"""
+        """
+        Higher level function to handle incoming webhooks. 
+        Deducts a function to call based on received webhook topic
+        """
+
         log_msg("Topic", topic, color=LOG_COLOR)
         if topic != "webhook":  # would recurse
             handler = f"handle_{topic}"
@@ -93,6 +99,20 @@ class WebhookServer():
 
     async def handle_connections(self, test):
         log_msg("Handle connections", color=LOG_COLOR)
+
+    async def handle_issue_credential(self, message):
+        state = message["state"]
+        cred_ex_id = message["credential_exchange_id"]
+
+        log_msg(f"Credential: state = {state}, credential_exchange_id {cred_ex_id}", color=LOG_COLOR)
+
+        if state == "offer_received":
+            response = self.api_handler.send_credential_request(cred_ex_id)
+            log_msg("response", response, color=LOG_COLOR)
+        elif state == "done":
+            cred_id = message["cred_id_stored"]
+            log_msg(f"Stored credential {cred_id} in wallet", color=LOG_COLOR)
+
 
     async def terminate(self):
         log_msg(f"Shutting down web hooks site", color=LOG_COLOR)

@@ -360,6 +360,15 @@ class ApiHandler:
             f"{self.__api_url}/schemas/created").json()['schema_ids']
         return response
 
+    def send_credential_request(self, cred_ex_id: str) -> None:
+        """
+        Send a credential request after receiving a credential offer
+        """
+        response = requests.post(
+            f"{self.__api_url}/issue-credential/records/{cred_ex_id}/send-request"
+        )
+        return response
+
     def create_credential_definition(
             self,
             schema_id: str,

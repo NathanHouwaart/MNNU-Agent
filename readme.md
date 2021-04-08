@@ -1,6 +1,13 @@
 # MNNU-Agent Python
 This repository contains all the modules and tools needed to setup one or multiple cloud based agent containers.
 
+For more information about a Verifiable Organisations Network, Self Sovereign Identity, Verifiable Credentials, Blockchain storage please consult the following webpages:
+- https://vonx.io/about/
+- https://bc-von.s3.amazonaws.com/2018-06-VON-Webinar-for-Sovrin-Indy-Community.mp4
+- https://bitsonblocks.net/2015/09/09/gentle-introduction-blockchain-technology/
+
+
+
 **Special Note**: If you are having a hard time gasping the concepts of a VON-Network, Verifiable Credentials and SSI, it is highly reccomended you checkout the following course: https://training.linuxfoundation.org/training/becoming-a-hyperledger-aries-developer-lfs173/
 This couse will help you understand the basics of SSI, Aries Cloud Agent and Verifiable credentials.
 

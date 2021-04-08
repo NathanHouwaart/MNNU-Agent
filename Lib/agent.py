@@ -58,20 +58,22 @@ class Agent:
             genesis_url=f"{transport_protocol}://{ledger_ip}:{ledger_port}/genesis"
         )
 
-        # Construct a webhook server object that handles incoming messages
-        self.webhook_server = WebhookServer(
-            identity=identity,
-            webhook_ip=ledger_ip,
-            webhook_protocol=transport_protocol,
-            webhook_port=start_port + 2
-        )  # TODO: webhook IP is not per definitie gelijk aan ledger ip
-
         # Construct Api Handler object that handles all Api calls
         self.api_handler = ApiHandler(  # TODO: Ledger transport protocol toevoegen
             transport_protocol=transport_protocol,
             api_url=ledger_ip,
             port=start_port + 1
         )
+
+        # Construct a webhook server object that handles incoming messages
+        self.webhook_server = WebhookServer(
+            identity=identity,
+            webhook_ip=ledger_ip,
+            webhook_protocol=transport_protocol,
+            webhook_port=start_port + 2,
+            api_handler=self.api_handler
+        )  # TODO: webhook IP is not per definitie gelijk aan ledger ip
+
 
         self.identity = identity
         self.start_port = start_port
@@ -106,15 +108,6 @@ class Agent:
         self.endpoint = f"{self.transport_protocol}://{self.ledger_ip}:{self.start_port}"
         log_msg(f"Admin URL is at: {self.admin_url}", color=LOG_COLOR)
         log_msg(f"Endpoint URL is at: {self.endpoint}", color=LOG_COLOR)
-
-    async def create_schema(self, schema: dict) -> dict:
-        """
-        Create a schema on the ACA-Py instance
-
-        :param schema: The schema to create
-        :return: The created schema as a dict
-        """
-        return self.api_handler.create_schema(schema)
 
     async def connections(self, *, alias_query: str = None, invitation_key_query: str = None, my_did_query: str = None, connection_state_query: str = None, their_did_query: str = None, their_role_query: str = None) -> dict:
         """
@@ -164,6 +157,46 @@ class Agent:
         connection_id = await prompt("Send message to <connection id> :")  # TODO: Throw exception when invitation is invalid
         message = await prompt("Message <message>:")
         self.api_handler.send_message(connection_id, message)
+
+    async def create_schema(self, schema: dict=None) -> dict:
+        """
+        Create a schema on the ACA-Py instance
+
+        :param schema: The schema to create
+        :return: The created schema as a dict
+        """
+        schema = await prompt("Schema :")  # TODO: Throw exception when schema is invalid
+        schema = json.loads(schema)
+        return self.api_handler.create_schema(schema)
+
+    async def create_credential_definition(self, schema_id: str=None, schema_tag: str=None, support_revocation: bool = False) -> str:
+        """
+        Create a credentials definition on the Ledger
+
+        :param schema_id: The id of the schema that the credential definition needs to be created from
+        :param schema_tag: The tag of the schema
+        :param supports_revocation: Bool to indicate if the credential definition needs to support revocation or not
+        """
+        schema_id = await prompt("Schema ID <id>:")     # TODO: Throw exception when invitation is invalid
+        schema_tag= await prompt("Schema tag <tag>:")   # TODO: Throw exception when invitation is invalid
+        return self.api_handler.create_credential_definition(schema_id, schema_tag, support_revocation)
+
+    async def issue_credential(self) -> dict:
+        """
+        Issue a credential to one of the agent. Promts the user for inputs.
+
+        :return: The result of the issue credential operation
+        """
+        connection_id = await prompt("Connection ID <id>: ")
+        cred_def_id = await prompt("Connection definition ID <id>: ")
+        schema = json.loads(await prompt("Schema <schema>: "))
+        log_msg(schema)
+        attributes = json.loads(await prompt("Attributes <attributes>: "))
+        log_msg(attributes)
+        return self.api_handler.issue_credential(connection_id, cred_def_id, attributes, schema)
+
+    async def get_credentials(self):
+        return self.api_handler.get_credentials()
 
     async def register_did(self, ledger_ip: str = None, alias: str = None, did: str = None, verkey: str = None, role: str = "TRUST_ANCHOR"):
         """
