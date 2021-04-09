@@ -36,8 +36,8 @@ class Agent:
         identity: str,
         start_port: int,
         transport_protocol: str,
-        ledger_ip: str,
-        ledger_port: int,
+        ledger_url: str,
+        local_ip: str,
         wallet_name: str,
         wallet_key: str,
         seed: str = "random",
@@ -47,28 +47,27 @@ class Agent:
         # Construct docker container object to maintain a running container
         self.docker_container = Container(
             identity=identity,
-            endpoint=f"{transport_protocol}://{ledger_ip}:{start_port}",
+            endpoint=f"{transport_protocol}://{local_ip}:{start_port}", #TODO:
             seed=seed,
             indbound_transport_port=start_port,
             outbound_transport_port=start_port + 1,
             transport_protocol=transport_protocol,
             wallet_name=wallet_name,
             wallet_key=wallet_key,
-            webhook_url=f"{transport_protocol}://{ledger_ip}:{start_port+2}/webhooks",
-            genesis_url=f"{transport_protocol}://{ledger_ip}:{ledger_port}/genesis"
+            webhook_url=f"{transport_protocol}://{local_ip}:{start_port+2}/webhooks", #TODO:
+            genesis_url=f"{ledger_url}/genesis"
         )
 
         # Construct Api Handler object that handles all Api calls
         self.api_handler = ApiHandler(  # TODO: Ledger transport protocol toevoegen
-            transport_protocol=transport_protocol,
-            api_url=ledger_ip,
+            api_url=local_ip,
             port=start_port + 1
         )
 
         # Construct a webhook server object that handles incoming messages
         self.webhook_server = WebhookServer(
             identity=identity,
-            webhook_ip=ledger_ip,
+            webhook_ip=local_ip,
             webhook_protocol=transport_protocol,
             webhook_port=start_port + 2,
             api_handler=self.api_handler
@@ -77,7 +76,8 @@ class Agent:
 
         self.identity = identity
         self.start_port = start_port
-        self.ledger_ip = ledger_ip
+        self.ledger_url = ledger_url
+        self.local_ip = local_ip
         self.seed = seed
         self.public_did = public_did
         self.auto_response = auto_response
@@ -104,8 +104,8 @@ class Agent:
         # TODO:  Timeout toevoegen, wanneer verkeerde key wordt gegeven, geeft hij alsog aan dat er een goeie connectie is
         if self.api_handler.test_connection() is False:
             return
-        self.admin_url = f"{self.transport_protocol}://{self.ledger_ip}:{self.start_port+1}"
-        self.endpoint = f"{self.transport_protocol}://{self.ledger_ip}:{self.start_port}"
+        self.admin_url = f"{self.transport_protocol}://{self.local_ip}:{self.start_port+1}"
+        self.endpoint = f"{self.transport_protocol}://{self.local_ip}:{self.start_port}"
         log_msg(f"Admin URL is at: {self.admin_url}", color=LOG_COLOR)
         log_msg(f"Endpoint URL is at: {self.endpoint}", color=LOG_COLOR)
 
@@ -202,7 +202,7 @@ class Agent:
         """
         Function registers a DID on the ledger
 
-        :param ledger_ip: The ip address op the ledger
+        :param ledger_url: The ledger_url of the ledger
         :param alias: The alias to gerister on the ledger
         :param did: Did to register
         :param verkey: Verkey to register
@@ -217,8 +217,7 @@ class Agent:
         else:
             data["seed"] = self.seed
         async with self.client_session.post(
-            # TODO: PORT niet hardcoden
-            f"{self.transport_protocol}://{self.ledger_ip}" + ":9000/register", json=data
+            f"{self.ledger_url}/register", json=data
         ) as resp:
             if resp.status != 200:
                 raise Exception(

@@ -74,8 +74,8 @@ if __name__ == "__main__":
         identity=args.identity,
         start_port=args.port,
         transport_protocol=args.transport_protocol,
-        ledger_ip=args.ledger_ip,       # Check of dit goed gaat bij een publieke ledger
-        ledger_port=9000,               # TODO: is dit nodig? bij een publieke ledger staat er geen port achter de url.
+        ledger_url=args.ledger_url,       # Check of dit goed gaat bij een publieke ledger
+        local_ip=args.local_ip,
         wallet_name=args.wallet_name,
         wallet_key=args.wallet_key,
         seed=args.seed,
@@ -83,15 +83,15 @@ if __name__ == "__main__":
         auto_response=args.no_auto
     )
 
-    # try:
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(aries_cloudagent_agent))
-    # except KeyboardInterrupt:
-    #     pass
-    # except Exception as e:
-    #     exception_name, exception_value, _ = sys.exc_info()
-    #     raise
-    # finally:
-    #     loop.run_until_complete(aries_cloudagent_agent.terminate())
-    #     loop.close()
-    #     os._exit(1)
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main(aries_cloudagent_agent))
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        exception_name, exception_value, _ = sys.exc_info()
+        raise
+    finally:
+        loop.run_until_complete(aries_cloudagent_agent.terminate())
+        loop.close()
+        os._exit(1)
