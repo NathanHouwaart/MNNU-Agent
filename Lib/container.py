@@ -74,7 +74,6 @@ class Container:
         :return: A list containing all the arguments needed to startup an agent
         """
         # TODO: goed implementeren
-        # TODO: LEDGER IP !+ ENDPOINT IP (DENK IK)
         result = [
             "python3", "-m", "aries_cloudagent", "start",
             "--endpoint", f"{self.endpoint}",
@@ -95,7 +94,6 @@ class Container:
             "--webhook-url", f"{self.webhook_url}",
             "--trace-target", "log",
             "--trace-tag", "acapy.events",
-            "--trace-label", "faber.agent.trace",  # TODO: niet hardcoden
             "--auto-accept-invites",
             "--auto-accept-requests",
             "--auto-store-credential"
