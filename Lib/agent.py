@@ -36,6 +36,7 @@ class Agent:
         identity: str,
         start_port: int,
         transport_protocol: str,
+        endpoint:str,
         ledger_url: str,
         local_ip: str,
         wallet_name: str,
@@ -47,7 +48,7 @@ class Agent:
         # Construct docker container object to maintain a running container
         self.docker_container = Container(
             identity=identity,
-            endpoint=f"{transport_protocol}://{local_ip}:{start_port}", #TODO:
+            endpoint=endpoint,
             seed=seed,
             indbound_transport_port=start_port,
             outbound_transport_port=start_port + 1,
@@ -124,7 +125,7 @@ class Agent:
         :param their_role_query: Only list connections with this "their role" value
         :return: Queried list of agent-to-agent connections with their states
         """
-        return self.api_handler.connections(alias_query=alias_query, invitation_key_query=invitation_key_query, connection_state_query=connection_state_query, their_did_query=their_did_query, their_role_query=their_did_query)
+        return self.api_handler.connections(alias_query=alias_query, invitation_key_query=invitation_key_query, my_did_query=my_did_query, connection_state_query=connection_state_query, their_did_query=their_did_query, their_role_query=their_did_query)
 
     async def generate_invitation(self, auto_accept: bool = True, multi_use: bool = False, display_qr: bool = False) -> tuple:
         """

@@ -49,6 +49,13 @@ def argument_parser() -> argparse.ArgumentParser:
         required=True
     )
     required.add_argument(
+        "--endpoint",
+        type=str,
+        metavar=("<endpoint>"),
+        help="endpoint for incoming messages",
+        required=True
+    )
+    required.add_argument(
         "--ledger-url",
         type=str,
         metavar=("<ledger-url>"),
