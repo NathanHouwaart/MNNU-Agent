@@ -87,6 +87,7 @@ class Container:
             "--wallet-type", "indy",  # TODO: niet hardcoden
             "--wallet-name", f"{self.wallet_name}",
             "--wallet-key", f"{self.wallet_key}",
+            "--wallet-storage-config", '{ "path":"/data"}',
             "--preserve-exchange-records",
             "--auto-provision",
             "--genesis-url", f"{self.genesis_url}",
