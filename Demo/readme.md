@@ -318,13 +318,14 @@ container.py:101                |  Docker Container exited with return code 0
 
 create schema:
 >>> {"attributes":["score","high_score"], "schema_name":"testschemaaaaaa", "schema_version":"9.05"}
-demo-agent.py:43                |  schema id: {"ver": "1.0", "id": "GLivWaXi8ebvKW3BgCQVWr:2:testschemaaaaaa:9.06", "name": "testschemaaaaaa", "version": "9.06", "attrNames": ["score", "high_score"], "seqNo": 8065}
+demo-agent.py:43                |  schema id: {'ver': '1.0', 'id': '6sYe1y3zXhmyrBkgHgAgaq:2:testschemaaaaaa:9.15', 'name': 'testschemaaaaaa', 'version': '9.15', 'attrNames': ['high_score', 'score'], 'seqNo': 8081}
 
 create credential def
 >>> Schema ID <id>: GLivWaXi8ebvKW3BgCQVWr:2:testschemaaaaaa:9.04
 >>> Schema tag <tag>:9.04
-demo-agent.py:46                |  credential def id: GLivWaXi8ebvKW3BgCQVWr:3:CL:8031:9.01
+demo-agent.py:46                |  credential def id: 6sYe1y3zXhmyrBkgHgAgaq:3:CL:8081:9.15
 
 
 issue credential:
+0c00dd6b-1901-490d-92d2-01c264bdce0e
 >>> [{"name": "score", "value": "12"},{"name": "high_score", "value": "300"}]

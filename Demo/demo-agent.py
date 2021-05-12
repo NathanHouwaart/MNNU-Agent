@@ -13,7 +13,7 @@ from agent import Agent
 from utilities import log_msg, prompt_loop
 
 LOG_COLOR = "hot pink"
-# docker run --name test1 --rm -it -p 0.0.0.0:8010-8011:8010-8011 -v /home/nathan/MNNU-Agent:/home/indy/MNNU-Agent -w /home/indy/MNNU-Agent/Demo mnnu-agent:0.5 "python3 demo-agent.py --port 8010 --identity test --ledger-url http://greenlight.bcovrin.vonx.io --endpoint https://curly-kangaroo-33.loca.lt --local-ip 127.0.0.1 --seed lMotigUUBzcqZl9BIx3103IfUN9Mjq82 --wallet-name test.Wallet --wallet-key test123"
+# docker run --name test1 --rm -it -p 0.0.0.0:8010-8011:8010-8011 -v C:\Users\Nathan\Documents\Innovation\MNNU-Agent:/home/indy/MNNU-Agent -w /home/indy/MNNU-Agent/Demo mnnu-agent:0.5 "python3 demo-agent.py --port 8010 --identity test --ledger-url http://greenlight.bcovrin.vonx.io --endpoint https://curly-kangaroo-33.loca.lt --local-ip 127.0.0.1 --seed lMotigUUBzcqZl9BIx3103IfUN9Mjq82 --wallet-name test.Wallet --wallet-key test123"
 # docker run --name test2 --rm -it -p 0.0.0.0:8012-8013:8012-8013 -v /home/nathan/MNNU-Agent:/home/indy/MNNU-Agent -w /home/indy/MNNU-Agent/Demo mnnu-agent:0.5 "python3 demo-agent.py --port 8012 --identity test2 --ledger-url http://greenlight.bcovrin.vonx.io --endpoint https://mean-chipmunk-98.loca.lt --local-ip 127.0.0.1 --seed lMotigUUBzcqZl9BIx3103IfUN9Mjq83 --wallet-name test2.Wallet --wallet-key test2123"
 
 async def main(args):
@@ -23,15 +23,20 @@ async def main(args):
     """
     global aries_cloudagent_agent
 
-    tunnel = LocalTunnel(args.port)
-    await tunnel.start_local_tunnel()
-    log_msg(tunnel.tunnel_url, color=LOG_COLOR)
+    incoming_tunnel = LocalTunnel(args.port)
+    api_tunnel = LocalTunnel(args.port+1)
+    
+    await incoming_tunnel.start_local_tunnel()
+    await api_tunnel.start_local_tunnel()
+    
+    log_msg("incoming_tunnel_url: ", incoming_tunnel.tunnel_url, color=LOG_COLOR)
+    log_msg("api_tunnel_url: ", api_tunnel.tunnel_url, color=LOG_COLOR)
     
     aries_cloudagent_agent = Agent(
         identity=args.identity,
         start_port=args.port,
         transport_protocol=args.transport_protocol,
-        endpoint=tunnel.tunnel_url,
+        endpoint=incoming_tunnel.tunnel_url,
         ledger_url=args.ledger_url,
         local_ip=args.local_ip,
         wallet_name=args.wallet_name,
